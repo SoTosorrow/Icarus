@@ -8,9 +8,9 @@ add_subdirectory(extern/imgui)
 
 set(MAIN 
     main.cpp
-    src/scene.cpp
-    src/node.cpp
-    src/node_socket.cpp)
+    core/scene.cpp
+    core/node.cpp)
+    # core/socket.cpp)
       
 set(current ${CMAKE_CURRENT_SOURCE_DIR})
 

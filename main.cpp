@@ -1,8 +1,8 @@
 #include<fmt/core.h>
 #include<memory>
 #include"imgui.h"
-#include"src/scene.hpp"
-#include"src/handle.cpp"
+#include"core/scene.hpp"
+#include"core/handle.cpp"
 
 struct Test
 {
@@ -35,15 +35,5 @@ int main() {
 }
 
 /*
-https://gist.github.com/ocornut/7e9b3ec566a333d725d4
-https://gist.github.com/ocornut/b3a9ecf13502fd818799a452969649ad
-
-@todo
-    delete link not full!!1  @better methods
-    delete enable = false but still exist in sockets find
-    ItemHoverable() instead of IsItemHoever?
-    socket function-bind from node to update size/color/shape/padding
-
-    executor/tbb/... for execute node
-    execute node data trans
+    the lost of channelSetCurrent
 */
