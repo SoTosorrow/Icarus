@@ -3,13 +3,15 @@
 
 Node::Node(
     std::weak_ptr<Scene> _scene,
-    std::shared_ptr<Context> _context,
-    const std::string_view &_name,
-    ImVec2 _pos)
-    :scene(std::move(_scene)),context(_context),name(_name),pos(_pos)
+    std::shared_ptr<Context> _context)
+    :scene(std::move(_scene)),context(_context)
 {
     this->id = _context->genId();
     fmt::print("node get{}\n",this->id);
+}
+
+void Node::setName(const std::string_view &_name){
+    this->name = _name;
 }
 
 void Node::setSocketsNum(int _input_sockets_num, int _output_sockets_num){
@@ -20,6 +22,16 @@ void Node::setSocketsNum(int _input_sockets_num, int _output_sockets_num){
 void Node::setNodeSize(int _size_x, int _size_y){
     this->size = ImVec2(_size_x, _size_y);
 }
+
+void Node::setPos(ImVec2 _pos) {
+    this->pos = _pos;
+}
+
+ImVec2 Node::getStartPos(){
+    // add graph pos
+    return this->pos + this->context->vp_trans;
+}
+
 
 void Node::init(){}
 
@@ -48,19 +60,23 @@ void Node::draw() {
 
 
     /// draw Node body View
-    draw_list->ChannelsSetCurrent(1);
+    draw_list->ChannelsSetCurrent(2);
     /// draw Node head
     draw_list->AddRectFilled(
-        node_start_pos,
-        node_start_pos + ImVec2(this->size.x, this->node_head_height),
-        node_head_color
+        node_start_pos
+        , node_start_pos + ImVec2(this->size.x, this->node_head_height)
+        , node_head_color
+        , 10.0f
+        , ImDrawFlags_::ImDrawFlags_RoundCornersTop
     );
 
     /// draw Node body
     draw_list->AddRectFilled(
-        node_start_pos + ImVec2(0, this->node_head_height),
-        node_start_pos + ImVec2(0, this->node_head_height) + this->size,
-        node_body_color
+        node_start_pos + ImVec2(0, this->node_head_height)
+        , node_start_pos + ImVec2(0, this->node_head_height) + this->size
+        , node_body_color
+        , 10.0f
+        , ImDrawFlags_::ImDrawFlags_RoundCornersBottom
     );
 
     /// add Node body Item
@@ -79,9 +95,9 @@ void Node::draw() {
     {
         auto test_size = ImGui::GetItemRectSize();
         draw_list->AddRectFilled(
-            node_start_pos,
-            node_start_pos + test_size,
-            node_body_color
+            node_start_pos
+            , node_start_pos + test_size
+            , node_body_color
         );
     }
     if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(0))

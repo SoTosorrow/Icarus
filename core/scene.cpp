@@ -9,6 +9,7 @@ void Scene::init(){
     auto lambda = [](std::shared_ptr<Node> node){
         node->setSocketsNum(2,5);
         node->setNodeSize(140, 60);
+        node->setPos({100,200});
         node->node_body_color = IM_COL32(200, 200, 150, 200);
     };
     auto node = this->addNode(lambda);
@@ -18,18 +19,16 @@ void Scene::addLink(){
 
 }
 
-auto Scene::addNode(
-    const std::function<void(std::shared_ptr<Node>)>& init_func, 
-    const std::string& name, 
-    ImVec2 pos) -> std::shared_ptr<Node>
+auto Scene::addNode(const std::function<void(std::shared_ptr<Node>)>& init_func) -> std::shared_ptr<Node>
 {
-    auto node = std::make_shared<Node>(this->weak_from_this(),this->context, name, pos);
+    auto node = std::make_shared<Node>(this->weak_from_this(), this->context);
     auto temp_id = node->id; 
 
     // lambda to define the node properties
     init_func(node);
     node->init();
     
+    // scene control the nodes
     this->map_nodes.insert({std::move(temp_id), node});
     return std::move(node);
 }
@@ -39,6 +38,7 @@ void Scene::drawBackground(){
     
     ImVec2 win_pos = ImGui::GetCursorScreenPos();
     ImVec2 canvas_sz = ImGui::GetWindowSize();
+
     for (float x = fmodf(this->context->vp_trans.x, scene_grid_sz); x < canvas_sz.x; x += scene_grid_sz)
         draw_list->AddLine(ImVec2(x, 0.0f) + win_pos, ImVec2(x, canvas_sz.y) + win_pos, scene_grid_color);
     for (float y = fmodf(this->context->vp_trans.y, scene_grid_sz); y < canvas_sz.y; y += scene_grid_sz)
@@ -73,11 +73,23 @@ void Scene::drawNodes(){
 void Scene::handleEvent() {
     ImGuiIO& io = ImGui::GetIO();
 
+    if (ImGui::IsMouseClicked(1)){
+        for(auto i=0;i<100;i++){
+            auto lambda = [i](std::shared_ptr<Node> node){
+                node->setName("hello");
+                node->setPos(ImGui::GetMousePos()+ImVec2(i*1,i*1));
+            };
+            this->addNode(std::bind_front(lambda));
+        }
+        // this->open_menu = !this->open_menu;
+    }
+
     /// adjust viewport zoom
     if(ImGui::IsMouseDown(1) && io.MouseWheel != 0) {
         this->context->changeViewportScale(io.MouseWheel * 0.1);
 
         //@todo change all node&socket pos&size
+        // this->adjustNodesView()
         fmt::print("{}\n",this->context->vp_scale);
     }
 
@@ -92,6 +104,7 @@ void Scene::show(){
     {
 
         ImGui::Text("Icarus average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+        ImGui::Text("Icraus Scene Node nums:%ld", this->map_nodes.size());
 
         auto draw_list = ImGui::GetWindowDrawList();
 

@@ -40,12 +40,10 @@ struct Scene: public std::enable_shared_from_this<Scene> {
         add Node to Scene map
         @param f to set node properties and execute before node init
         @old template<class F>
-             auto addNode(F const& f=[](std::shared_ptr<Node> node){}, const std::string& name="hello", ImVec2 pos=ImVec2(300,300))-> std::shared_ptr<Node>;
+             auto addNode(F const& f=[](std::shared_ptr<Node> node){})-> std::shared_ptr<Node>;
     */
     auto addNode(
-        const std::function<void(std::shared_ptr<Node>)>& f = [](std::shared_ptr<Node> node){}, 
-        const std::string& name = "hello", 
-        ImVec2 pos=ImVec2(300,300)
+        const std::function<void(std::shared_ptr<Node>)>& f = [](std::shared_ptr<Node> node){}
     ) -> std::shared_ptr<Node>; 
 
     /// add link for socket&map_links
